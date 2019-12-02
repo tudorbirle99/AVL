@@ -1,0 +1,164 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int Key;
+    int Val;
+    int L;          // level
+    int BF;         // balance factor
+    struct Node *Left, *Right;
+};
+
+
+
+void drum(struct Node* p, int *max, int lung)
+{
+    if (p!=NULL)
+    {
+        drum(p->Right, max, lung+1);
+        if ((p->Left==NULL)&&(p->Right==NULL)&&(*max<lung))
+            *max=lung;
+        drum(p->Left, max, lung+1);
+    }
+}
+
+
+struct Node *insert(int k, struct Node* T)
+{
+    if(T==NULL)
+    {
+        T = (struct Node*)malloc(sizeof(struct Node));
+        if(T==NULL)
+        {
+            printf("\n Eroare alocare Node!");
+            exit(1);
+        }
+        else
+        {
+            T->Key = k;
+            T->Left = T->Right = NULL;
+        }
+    }
+    else if(k < T->Key)
+        T->Left = insert(k, T->Left);
+    else if(k > T->Key)
+        T->Right = insert(k, T->Right);
+
+    return T;
+}
+
+void factor_echilibru(struct Node *p)
+{
+    int hLeft,hRight;
+    hLeft = 1;
+    hRight= 1;
+
+    if(p->Left != NULL)
+        drum(p->Left, &hLeft, 1);
+    else
+        hLeft=0;
+
+    if(p->Right != NULL)
+        drum(p->Right, &hRight,1);
+    else
+        hRight = 0;
+
+    p->BF = hRight - hLeft;
+printf(" factor balansare:%d",0);
+}
+
+
+void Insert(int k, struct Node** T)
+{
+    if(*T == NULL)
+    {
+        *T = (struct Node*)malloc(sizeof(struct Node));
+        if(*T == NULL)
+        {
+            printf("\n Eroare alocare Node!");
+            exit(1);
+        }
+        else
+        {
+            (*T)->Key = k;
+            (*T)->Left = (*T)->Right = NULL;
+            return;
+        }
+    }
+    else
+    {
+        if(k < (*T)->Key){
+            Insert(k, &((*T)->Left));
+        }
+        else {
+            if(k > (*T)->Key);
+                Insert(k, &((*T)->Right));
+        }
+    }
+    return;
+}
+
+void preorder(struct Node* head, int level){
+if(head !=NULL)
+{
+     printf("%3d",head->Key);
+        head->L = level;
+        factor_echilibru(head);
+        printf("\n");
+     preorder(head->Left, level+1);
+      preorder(head->Right, level+1);
+}
+
+}
+
+
+int Height(struct Node* p){
+    int hl,hr;
+    hl=hr=0;
+    if(p){
+        if(p->Left) hl = 1 + Height(p->Left);
+        if(p->Right) hr = 1 + Height(p->Right);
+    }
+    return (hl>hr)?hl:hr;
+}
+
+
+int main(int argc, char *argv[])
+{
+    int height;
+    struct Node *tree = NULL;
+    struct Node** Tree;
+    Tree = &tree;
+
+    Insert(54, Tree);
+    Insert(85, Tree);
+    Insert(28, Tree);
+    Insert(32, Tree);
+    Insert(14, Tree);
+
+
+    printf(" Preordine:\n");
+    preorder(tree,0);
+
+
+
+
+
+    // calculez inaltimea
+    height=0;
+    drum(tree, &height, 0);
+    printf("\nInaltimea nodului %d este %d\n", tree->Key, height);
+
+    // varianta
+    printf("\nInaltimea nodului %d este %d\n", tree->Key, Height(tree));
+
+
+    height=0;
+    drum((*Tree)->Right, &height, 0);
+    printf("\nInaltimea nodului %d este %d\n", (*Tree)->Right->Key, height);
+
+
+
+    printf("\n\n");
+    return 0;
+}
